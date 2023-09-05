@@ -28,8 +28,6 @@ if st.button("Submit URL"):
         url_list.append(url)
 
     VectorStore = process_and_save(url_list)
-
-    st.write(vectorStore_openAI)
     
     llm=OpenAI(temperature=0)
     
