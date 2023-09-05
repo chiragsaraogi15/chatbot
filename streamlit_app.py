@@ -10,6 +10,7 @@ import pickle
 from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.chains.question_answering import load_qa_chain
 from langchain import OpenAI
+from process_save_doc import process_and_save
 
 
 # Streamlit UI
@@ -25,3 +26,7 @@ url = st.text_input("Enter a URL:")
 if st.button("Submit URL"):
     if url:
         url_list.append(url)
+
+vectorStore_openAI = process_and_save(url_list)
+
+st.write(vectorStore_openAI)
