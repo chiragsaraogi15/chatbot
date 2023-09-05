@@ -21,31 +21,25 @@ os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_KEY"]
 
 url_list = []
 
-url = st.text_input("Enter a URL:")
-
 if st.button("Submit URL"):
+    url = st.text_input("Enter URL:")
     if url:
         url_list.append(url)
 
+if url_list:
     VectorStore = process_and_save(url_list)
     
-    llm=OpenAI(temperature=0)
+    llm = OpenAI(temperature=0)
     
     chain = RetrievalQAWithSourcesChain.from_llm(llm=llm, retriever=VectorStore.as_retriever())
     
     user_question = st.text_input("Enter your question:")
     
     if st.button("Ask"):
-    
         if user_question:
-        
             response = chain({"question": user_question}, return_only_outputs=True)
-            
             answer = response['answer'].replace('\n', '')
-            
             sources = response.get('sources', '')
-            
             st.write("Answer:", answer)
-            
             st.write("Sources:", sources)
     
