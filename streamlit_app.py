@@ -27,7 +27,9 @@ if st.button("Submit URL"):
     if url:
         url_list.append(url)
 
-    vectorStore_openAI = process_and_save(url_list)
+    VectorStore = process_and_save(url_list)
+
+    st.write(vectorStore_openAI)
     
     llm=OpenAI(temperature=0)
     
@@ -36,4 +38,5 @@ if st.button("Submit URL"):
     user_question = st.text_input("Enter your question:")
     
     st.write(user_question)
-            
+    
+    
