@@ -1,4 +1,5 @@
-llama-index==0.8.20 
-openai==0.27.0
-llama-cpp-python==1.0.0
-streamlit==1.7.0
+langchain
+faiss-cpu
+openai
+unstructured
+tiktoken

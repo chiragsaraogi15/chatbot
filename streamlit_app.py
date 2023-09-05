@@ -1,58 +1,91 @@
 import streamlit as st
-import llama_index
-import openai
 import os
+import pickle
+import faiss
+from langchain.document_loaders import UnstructuredURLLoader
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.vectorstores import FAISS
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.chains import RetrievalQAWithSourcesChain
+from langchain.chains.question_answering import load_qa_chain
+from langchain import OpenAI
 
-# Set your OpenAI API key
-os.environ['OPENAI_API_KEY'] = 'YOUR_OPENAI_API_KEY'
+os.environ["OPENAI_API_KEY"] = "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"
 
-# Set the page title
-st.title("Document Conversation App")
+# Streamlit UI
+st.title("WebChatMate: Your Conversational URL Companion")
 
-# File Upload
-uploaded_file = st.file_uploader("Upload a PDF document", type=["pdf"])
+# Define the path where you want to save the file
+file_path = "faiss_store_openai.pkl"
 
-# Initialize the index
-if uploaded_file:
-    documents = llama_index.Document.from_file(uploaded_file)
-    index = llama_index.VectorStoreIndex.from_documents([documents])
-    index.storage_context.persist()
-    storage_context = llama_index.StorageContext.from_defaults(persist_dir="./storage")
-    index = llama_index.load_index_from_storage(storage_context)
-    query_engine = index.as_query_engine()
-    st.success("PDF document uploaded and indexed successfully!")
+# Initialize variables to store the vector store and LLM chain
+VectorStore = None
+chain = None
 
-    # Initialize a conversation history
-    conversation_history = []
+def create_or_load_vector_store(docs):
+    if not os.path.exists(file_path):
+        embeddings = OpenAIEmbeddings()
+        vectorStore_openAI = FAISS.from_documents(docs, embeddings)
+        with open(file_path, "wb") as f:
+            pickle.dump(vectorStore_openAI, f)
+    else:
+        with open(file_path, "rb") as f:
+            vectorStore_openAI = pickle.load(f)
+    return vectorStore_openAI
+    
+url = st.text_input("Enter URL:")
 
-    # Function to generate a response using the LLM
-    def generate_response(prompt):
-        # Add the prompt to the conversation history
-        conversation_history.append(prompt)
+if st.button("Submit"):
+    try:
+        # Load and preprocess the data from the URL
+        urls = [url]
+        
+        loaders = UnstructuredURLLoader(urls=urls)
+        
+        data = loaders.load()
 
-        # Generate a response using the entire conversation history as context
-        response = query_engine.query('\n'.join(conversation_history))
+        text_splitter = CharacterTextSplitter(separator='\n',chunk_size=1000,chunk_overlap=300)
+        
+        docs = text_splitter.split_documents(data)
 
-        # Convert the response to a string
-        llm_response = str(response)
+        # Create or load the FAISS vector store
+        VectorStore = create_or_load_vector_store(docs)
 
-        # Add the LLM's response to the conversation history
-        conversation_history.append(llm_response)
+        # Initialize the LLM and QA chain
+        llm = OpenAI(temperature=0)
+        
+        chain = RetrievalQAWithSourcesChain.from_llm(llm=llm, retriever=VectorStore.as_retriever())
 
-        return llm_response
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+        
+question = st.text_input("Enter your question:")
 
-    # User input for conversation
-    user_input = st.text_input("Ask a question or provide a comment:")
+if st.button("Ask"):
+    try:
+        if chain is not None:
+            response = chain({"question": question}, return_only_outputs=True)
 
-    if st.button("Submit"):
-        if user_input:
-            llm_response = generate_response(user_input)
-            st.text("LLM Response:")
-            st.write(llm_response)
-        else:
-            st.warning("Please enter a question or comment.")
+            # Get the answer from the response and remove the newline character
+            answer = response['answer'].replace('\n', '')
 
-    # Display conversation history
-    if conversation_history:
-        st.text("Conversation History:")
-        st.write('\n'.join(conversation_history))
+            # Preserve the 'sources' information
+            sources = response.get('sources', '')
+
+            # Display the answer and sources
+            st.subheader("Answer:")
+            st.write(answer)
+            st.subheader("Sources:")
+            st.write(sources)
+
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+
+# Reset button
+if st.button("Reset"):
+    st.text_input("Enter URL:")
+    st.text_input("Enter your question:")
+
+# Exit button
+if st.button("Exit"):
+    st.stop()
