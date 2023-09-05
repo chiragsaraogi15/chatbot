@@ -17,3 +17,11 @@ st.title("WebChatMate")
 st.subheader("Your Conversational URL Companion")
 
 os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_KEY"]
+
+url_list = []
+
+url = st.text_input("Enter a URL:")
+
+if st.button("Submit URL"):
+    if url:
+        url_list.append(url)
