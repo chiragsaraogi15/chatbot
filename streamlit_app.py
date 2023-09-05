@@ -36,11 +36,11 @@ if url_list:
     
     user_question = st.text_input("Enter your question:")
     
-    if st.button("Ask"):
-        if user_question:
-            response = chain({"question": user_question}, return_only_outputs=True)
-            answer = response['answer'].replace('\n', '')
-            sources = response.get('sources', '')
-            st.write("Answer:", answer)
-            st.write("Sources:", sources)
+    if user_question:
+    
+        response = chain({"question": user_question}, return_only_outputs=True)
+        answer = response['answer'].replace('\n', '')
+        sources = response.get('sources', '')
+        st.write("Answer:", answer)
+        st.write("Sources:", sources)
     
