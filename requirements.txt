@@ -1,3 +1,4 @@
+python-decouple
 langchain
 faiss-cpu
 openai
