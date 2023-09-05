@@ -21,8 +21,9 @@ os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_KEY"]
 
 url_list = []
 
-if st.button("Submit URL"):
-    url = st.text_input("Enter URL:")
+url = st.text_input("Enter Your URL")
+
+if st.button("Submit"):
     if url:
         url_list.append(url)
 
