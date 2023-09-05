@@ -27,6 +27,6 @@ if st.button("Submit URL"):
     if url:
         url_list.append(url)
 
-vectorStore_openAI = process_and_save(url_list)
+    vectorStore_openAI = process_and_save(url_list)
 
-st.write(vectorStore_openAI)
+    st.write(vectorStore_openAI)
