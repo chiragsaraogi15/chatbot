@@ -10,7 +10,13 @@ from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.chains.question_answering import load_qa_chain
 from langchain import OpenAI
 
-os.environ["OPENAI_API_KEY"] = "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"
+api_key = os.environ.get("OPENAI_API_KEY")
+
+if api_key is None:
+    st.error("API key not found. Please set the OPENAI_API_KEY environment variable.")
+    st.stop()
+
+os.environ["OPENAI_API_KEY"] = api_key
 
 # Streamlit UI
 st.title("WebChatMate: Your Conversational URL Companion")
