@@ -14,6 +14,6 @@ from langchain import OpenAI
 
 # Streamlit UI
 st.title("WebChatMate")
-st.write("Your Conversational URL Companion")
+st.subheader("Your Conversational URL Companion")
 
 os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_KEY"]
