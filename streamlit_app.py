@@ -60,15 +60,15 @@ if submit and url:
     )
 
 if st.session_state.chain:
-    while True:
+    while not st.session_state.is_exiting:
         user_question = st.text_input("Enter your question:", key=get_input_key())
         ask = st.button("Ask", key=get_button_key())
         
         if user_question.lower() == 'exit':
+            st.session_state.is_exiting = True
             st.write("WebChatMate: Goodbye!")
-            break
-        
-        if ask and user_question and st.session_state.chain:
+            
+        elif ask and user_question:
             response = st.session_state.chain(
                 {"question": user_question}, return_only_outputs=True
             )
