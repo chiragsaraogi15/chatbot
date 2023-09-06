@@ -27,6 +27,20 @@ def get_button_key():
     input_counter += 1
     return key
 
+def process_and_save(urls):
+    loaders = UnstructuredURLLoader(urls=urls)
+    data = loaders.load()
+
+    text_splitter = CharacterTextSplitter(
+        separator="\n", chunk_size=1000, chunk_overlap=300
+    )
+    docs = text_splitter.split_documents(data)
+
+    embeddings = OpenAIEmbeddings()
+    vectorStore_openAI = FAISS.from_documents(docs, embeddings)
+
+    return vectorStore_openAI
+
 st.title("WebChatMate")
 st.subheader("Your Conversational URL Companion")
 
