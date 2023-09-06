@@ -61,6 +61,7 @@ if submit and url:
 
 
 st.session_state.is_exiting = False
+st.session_state.current_question = None
 
 if st.session_state.chain:
     while not st.session_state.is_exiting:
