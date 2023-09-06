@@ -48,18 +48,24 @@ if submit and url:
         llm=llm, retriever=st.session_state.VectorStore.as_retriever()
     )
 
-st.write("URLs", st.session_state.url_list)
 
 if st.session_state.chain:
-    user_question = st.text_input("Enter your question:")
-
-    ask = st.button("Ask")
-
-    if ask and user_question and st.session_state.chain:
-        response = st.session_state.chain(
-            {"question": user_question}, return_only_outputs=True
-        )
-        answer = response["answer"].replace("\n", "")
-        sources = response.get("sources", "")
-        st.write("Answer:", answer)
-        st.write("Sources:", sources)
+    
+    while True:
+    
+        user_question = st.text_input("Enter your question:")
+        
+        ask = st.button("Ask")
+        
+        if user_question.lower() == 'exit':
+            st.write("WebChatMate: Goodbye!")
+            break
+        
+        if ask and user_question and st.session_state.chain:
+            response = st.session_state.chain(
+                {"question": user_question}, return_only_outputs=True
+            )
+            answer = response["answer"].replace("\n", "")
+            sources = response.get("sources", "")
+            st.write("Answer:", answer)
+            st.write("Sources:", sources)
