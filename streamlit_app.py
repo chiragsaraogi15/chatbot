@@ -24,29 +24,28 @@ os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_KEY"]
 
 url = st.text_input("Enter Your URL")
 
-if st.button("Submit"):
-    if url:
-        st.session_state.url_list.append(url)
-        st.session_state.VectorStore = process_and_save(st.session_state.url_list)
-        llm = OpenAI(temperature=0)
-        st.session_state.chain = RetrievalQAWithSourcesChain.from_llm(llm=llm, retriever=st.session_state.VectorStore.as_retriever())
+submit = st.button('Submit')
 
-user_question = st.text_input("Enter your question:")
+if submit and url:
+    
+    st.session_state.url_list.append(url)
+    st.session_state.VectorStore = process_and_save(st.session_state.url_list)
+    llm = OpenAI(temperature=0)
+    st.session_state.chain = RetrievalQAWithSourcesChain.from_llm(llm=llm, retriever=st.session_state.VectorStore.as_retriever())
 
-if st.button('Ask'):
-    if st.session_state.chain and user_question:
+    user_question = st.text_input("Enter your question:")
+
+    ask = st.button('Ask')
+    
+    if ask and user_question and st.session_state.chain:
+    
         response = st.session_state.chain({"question": user_question}, return_only_outputs=True)
         answer = response['answer'].replace('\n', '')
         sources = response.get('sources', '')
         st.write("Answer:", answer)
         st.write("Sources:", sources)
-    elif not user_question:
-        st.write('Please enter a question')
-    else:
-        st.write('Please submit a valid URL first')
+            
+ 
+            
 
-# Display the stored URLs
-if st.session_state.url_list:
-    st.subheader("Stored URLs:")
-    for stored_url in st.session_state.url_list:
-        st.write(stored_url)
+
