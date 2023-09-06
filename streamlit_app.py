@@ -59,7 +59,11 @@ if submit and url:
         llm=llm, retriever=st.session_state.VectorStore.as_retriever()
     )
 
+
+st.session_state.is_exiting = False
+
 if st.session_state.chain:
+    
     while not st.session_state.is_exiting:
         user_question = st.text_input("Enter your question:", key=get_input_key())
         ask = st.button("Ask", key=get_button_key())
