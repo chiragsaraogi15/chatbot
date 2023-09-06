@@ -30,6 +30,15 @@ if "url_list" not in st.session_state:
     st.session_state.VectorStore = None
     st.session_state.chain = None
 
+input_counter = 0
+
+def get_input_key():
+    global input_counter
+    key = f"input_{input_counter}"
+    input_counter += 1
+    return key
+
+
 st.title("WebChatMate")
 st.subheader("Your Conversational URL Companion")
 
@@ -49,11 +58,14 @@ if submit and url:
     )
 
 
+
 if st.session_state.chain:
+        
+    
     
     while True:
     
-        user_question = st.text_input("Enter your question:")
+        user_question = st.text_input("Enter your question:", key=get_input_key())
         
         ask = st.button("Ask")
         
@@ -66,6 +78,6 @@ if st.session_state.chain:
                 {"question": user_question}, return_only_outputs=True
             )
             answer = response["answer"].replace("\n", "")
-            sources = response.get("sources", "")
+  
             st.write("Answer:", answer)
-            st.write("Sources:", sources)
+     
