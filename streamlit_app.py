@@ -60,22 +60,19 @@ if submit and url:
     )
 
 
-if 'is_exiting' not in st.session_state:
-    st.session_state.is_exiting = False
-
-if 'current_question' not in st.session_state:
-    st.session_state.current_question = None
-
+st.session_state.is_exiting = False
+st.session_state.current_question = None
 
 if st.session_state.chain:
     while not st.session_state.is_exiting:
-    
         if st.session_state.current_question is None:
             st.session_state.current_question = st.text_input("Enter your question:", key=get_input_key())
             ask = st.button("Ask", key=get_button_key())
-        
+            if st.session_state.current_question.lower() == 'exit':
+                st.session_state.is_exiting = True
+                st.write('Goodbye!!')
         else:
- 
+            st.write("Question:", st.session_state.current_question)
             response = st.session_state.chain(
                 {"question": st.session_state.current_question}, return_only_outputs=True
             )
