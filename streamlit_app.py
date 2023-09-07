@@ -60,19 +60,27 @@ if submit and url:
     )
 
 
-st.session_state.is_exiting = False
-st.session_state.current_question = None
+if 'is_exiting' not in st.session_state:
+    st.session_state.is_exiting = False
 
-if st.session_state.chain:
-    while not st.session_state.is_exiting:
-        if st.session_state.current_question is None:
-            st.session_state.current_question = st.text_input("Enter your question:", key=get_input_key())
-            ask = st.button("Ask", key=get_button_key())
-        else:
-            st.write("Question:", st.session_state.current_question)
-            response = st.session_state.chain(
-                {"question": st.session_state.current_question}, return_only_outputs=True
-            )
-            answer = response["answer"].replace("\n", "")
-            st.write("Answer:", answer)
-            st.session_state.current_question = None
+if 'current_question' not in st.session_state:
+    st.session_state.current_question = None
+
+
+while not st.session_state.is_exiting:
+    if st.session_state.current_question is None:
+        st.session_state.current_question = st.text_input("Enter your question (type 'exit' to exit):", key=get_input_key())
+        ask = st.button("Ask", key=get_button_key())
+    else:
+        response = st.session_state.chain(
+            {"question": st.session_state.current_question}, return_only_outputs=True
+        )
+        answer = response["answer"].replace("\n", "")
+        st.write("Answer:", answer)
+        st.session_state.current_question = None
+
+        # Check if the user typed 'exit' to exit the loop
+        if st.session_state.current_question.lower() == 'exit':
+            st.session_state.is_exiting = True
+
+
