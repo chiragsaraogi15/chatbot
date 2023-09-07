@@ -72,7 +72,6 @@ if st.session_state.chain:
                 st.session_state.is_exiting = True
                 st.write('Goodbye!!')
         else:
-            st.write("Question:", st.session_state.current_question)
             response = st.session_state.chain(
                 {"question": st.session_state.current_question}, return_only_outputs=True
             )
